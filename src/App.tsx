@@ -1,7 +1,11 @@
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { GlobeHemisphereWest, Sun, Ruler, ThermometerSimple, MapPin } from "@phosphor-icons/react";
-import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { GlobeHemisphereWest, Sun, Ruler, ThermometerSimple, MapPin, X } from "@phosphor-icons/react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import FactDetail from "@/components/FactDetail";
 
 interface Fact {
   id: number;
@@ -50,6 +54,8 @@ const facts: Fact[] = [
 ];
 
 function App() {
+  const [selectedFact, setSelectedFact] = useState<number | null>(null);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-blue-50/30 to-green-50/30">
       <div className="container mx-auto px-4 py-12 max-w-6xl">
@@ -63,7 +69,7 @@ function App() {
             🌍 Amazing Equator Facts! 🌍
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground font-medium">
-            Learn 5 Cool Things About Earth's Middle Line
+            Click on any fact to explore with pictures and diagrams!
           </p>
         </motion.div>
 
@@ -77,7 +83,10 @@ function App() {
               whileHover={{ y: -4 }}
               className={index === 4 ? "md:col-span-2 lg:col-span-1" : ""}
             >
-              <Card className="h-full p-8 hover:shadow-xl transition-all duration-300 border-2 bg-card/80 backdrop-blur-sm">
+              <Card 
+                className="h-full p-8 hover:shadow-xl transition-all duration-300 border-2 bg-card/80 backdrop-blur-sm cursor-pointer"
+                onClick={() => setSelectedFact(fact.id)}
+              >
                 <div className="flex flex-col items-center text-center gap-4">
                   <Badge 
                     variant="secondary" 
@@ -101,6 +110,10 @@ function App() {
                   <p className="text-base text-foreground/80 leading-relaxed">
                     {fact.description}
                   </p>
+
+                  <Button variant="outline" size="sm" className="mt-2">
+                    Explore More →
+                  </Button>
                 </div>
               </Card>
             </motion.div>
@@ -118,6 +131,24 @@ function App() {
           </p>
         </motion.div>
       </div>
+
+      <Dialog open={selectedFact !== null} onOpenChange={() => setSelectedFact(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold flex items-center gap-3">
+              {selectedFact && (
+                <>
+                  <span className={facts[selectedFact - 1].color}>
+                    {facts[selectedFact - 1].icon}
+                  </span>
+                  {facts[selectedFact - 1].title}
+                </>
+              )}
+            </DialogTitle>
+          </DialogHeader>
+          {selectedFact && <FactDetail factId={selectedFact} />}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
